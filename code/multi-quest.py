@@ -4,16 +4,23 @@ import pyttsx3
 import json
 import datetime
 import os
+from expiring_dict import ExpiringDict
 
 def main():
-
+    minTime = 120
     cards = {'0005269927': 1,
         '0005264120': 2,
         '0005253090': 3,
         '0005322773': 4,
         '0005275274': 5
     }
-    
+    teams = {'1': 'Frodo',
+             '2': 'Gandalf',
+             '3': 'Legolas',
+             '4': 'Gimli',
+             '5': 'Samwise'
+        }
+    dict_ttl = ExpiringDict(minTime)
     engine = pyttsx3.init()
     voices = engine.getProperty('voices')
     #change_voice(engine, "en_US", "VoiceGenderFemale")
@@ -33,21 +40,26 @@ def main():
             card_id = line.strip()
             if card_id:
                 if cards[card_id]:
-                    teamNo = cards[card_id]    
-                    print('Welcome team ' + str(teamNo))
-                    engine.say('Welcome team ' + str(teamNo))
-                    engine.runAndWait()
-                    next = findBestPost(log, posts, teamNo)
-                    
-                    if not next:
-                        engine.say('Return to checkin team ' + str(teamNo))
+                    teamNo = cards[card_id]
+                    if str(teamNo) in dict_ttl:
+                        engine.say('Please go to ' + dict_ttl[str(teamNo)])
                         engine.runAndWait()
-                    else:
-                        #println next
-                        logEntry(log, next["id"], teamNo)
-                        engine.say('Please go to ' + next["name"])
+                    else:    
+                        print('Welcome team ' + teams[str(teamNo)])
+                        engine.say('Welcome team ' + teams[str(teamNo)] )
                         engine.runAndWait()
-    
+                        next = findBestPost(log, posts, teamNo)
+                        
+                        if not next:
+                            engine.say('Return to checkin team ' + teams[str(teamNo)])
+                            engine.runAndWait()
+                        else:
+                            #println next
+                            logEntry(log, next["id"], teamNo)
+                            dict_ttl[str(teamNo)] = next["name"]
+                            engine.say('Please go to ' + next["name"])
+                            engine.runAndWait()
+        
     engine.stop()
 
 def change_voice(engine, language, gender='VoiceGenderFemale'):
@@ -90,6 +102,8 @@ def findBestPost(log, posts, teamNo):
                 
     if uncompletedPost:
         logEntry(log, uncompletedPost, teamNo)
+    if candidate == None:
+        return
     if uncompletedPost == candidate["id"]:
         return
     return candidate

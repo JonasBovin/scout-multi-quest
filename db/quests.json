@@ -1,21 +1,21 @@
 [
 	{
-		"name": "Mountain",
+		"name": "Mines of moria",
 		"id": 1
 
 	},
 	{
-		"name": "Forrest",
+		"name": "Saurons Tower",
 		"id": 2
 
 	},
 	{
-		"name": "Stream",
+		"name": "Forrest of the ents",
 		"id": 3
 
 	},
 	{
-		"name": "Golden Egg",
+		"name": "Rivendell",
 		"id": 4
 
 	}
